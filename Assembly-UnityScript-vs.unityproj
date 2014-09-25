@@ -48,7 +48,6 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\JavaScripts\BumpTextureTileAnimation.js" />
      <Compile Include="Assets\Scripts\JavaScripts\Car.js" />
-     <Compile Include="Assets\Scripts\JavaScripts\CaterPillar.js" />
      <Compile Include="Assets\Scripts\JavaScripts\CrashController.js" />
      <Compile Include="Assets\Scripts\JavaScripts\FPSCounter.js" />
      <Compile Include="Assets\Scripts\JavaScripts\LightmapperObjectUV.js" />
@@ -57,8 +56,10 @@
      <Compile Include="Assets\Scripts\JavaScripts\Skidmarks.js" />
      <Compile Include="Assets\Scripts\JavaScripts\SoundController.js" />
      <Compile Include="Assets\Scripts\JavaScripts\SoundToggler.js" />
-     <Compile Include="Assets\Scripts\JavaScripts\Tank\TurretController.js" />
-     <Compile Include="Assets\Scripts\JavaScripts\TankCamera.js" />
+     <Compile Include="Assets\Tank\Scripts\PlayerTankDriver.js" />
+     <Compile Include="Assets\Tank\Scripts\TankCamera.js" />
+     <Compile Include="Assets\Tank\Scripts\TankController.js" />
+     <Compile Include="Assets\Tank\Scripts\TurretController.js" />
      <None Include="Assets\Pro Standard Assets\Glass Refraction\Glass-Stained-BumpDistort.shader" />
      <None Include="Assets\Pro Standard Assets\Image Based\NoiseEffectShaderRGB.shader" />
      <None Include="Assets\Pro Standard Assets\Image Based\GlowEffectDownsample.shader" />

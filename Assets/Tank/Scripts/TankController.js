@@ -57,14 +57,12 @@ function Start()
 	
 	SetupCenterOfMass();
 	
-	topSpeed = Convert_Miles_Per_Hour_To_Meters_Per_Second(topSpeed);
+	topSpeed = topSpeed * 1000 / 60.0;
 }
 
 function Update()
 {
 	var relativeVelocity : Vector3 = transform.InverseTransformDirection(rigidbody.velocity);
-	
-	GetInput();
 	
 	Check_If_Car_Is_Flipped();
 	
@@ -142,23 +140,26 @@ function SetupWheel(wheelTransform : Transform, isFrontWheel : boolean)
 	wc.sidewaysFriction = wfc;
 	wc.forwardFriction = wfc;
 	wheel.wheelGraphic = wheelTransform;
-	wheel.tireGraphic = wheelTransform.GetComponentsInChildren(Transform)[1];
 	
-	wheelRadius = wheel.tireGraphic.renderer.bounds.size.y / 2;	
+	var tmpTransforms = wheelTransform.GetComponentsInChildren(Transform);
+	wheel.tireGraphic = tmpTransforms[1];
+	for(var tmpTransform : Transform in tmpTransforms) {
+		if (tmpTransform == tmpTransforms[0]) {
+			continue;
+		}
+		if (!!tmpTransform.renderer) {
+			wheelRadius = tmpTransform.renderer.bounds.size.y / 2;	
+			break;		
+		}
+	}
 	wheel.collider.radius = wheelRadius;
 	
-	if (isFrontWheel)
-	{
+	if (isFrontWheel) {
 		wheel.steerWheel = true;
-		
-		go = new GameObject(wheelTransform.name + " Steer Column");
-		go.transform.position = wheelTransform.position;
-		go.transform.rotation = wheelTransform.rotation;
-		go.transform.parent = transform;
-		wheelTransform.parent = go.transform;
 	}
-	else
+	else {
 		wheel.driveWheel = true;
+	}
 		
 	return wheel;
 }
@@ -173,10 +174,10 @@ function SetupCenterOfMass()
 /* Functions called from Update()                 */
 /**************************************************/
 
-function GetInput()
+function GetInput(input)
 {
-	throttle = Input.GetAxis("Vertical");
-	steer = Input.GetAxis("Horizontal");
+	throttle = input[0];
+	steer = input[1];
 }
 
 function Check_If_Car_Is_Flipped()
@@ -250,8 +251,9 @@ function ApplyThrottle(canDrive : boolean, relativeVelocity : Vector3)
 {
 	for(var w : CaterpillarWheel in wheels)
 	{
-		var multiplier = throttle + (ArrayUtility.IndexOf(wheels, w) % 2 == 0?1:-1) * steer; 
+//		var multiplier = Mathf.Clamp(throttle + (ArrayUtility.IndexOf(wheels, w) % 2 == 0?1:-1) * steer, -1, 1);
 		var flag = HaveTheSameSign(relativeVelocity.z, throttle) || Mathf.Abs(relativeVelocity.z) < 1;
+		var multiplier = throttle + (ArrayUtility.IndexOf(wheels, w) % 2 == 0?1:-1) * steer * (throttle >= 0?1:-1); 
 		
 		w.collider.motorTorque = flag?multiplier * Mathf.Sign(motorTorque) * (getMotorTorque(Mathf.Max(Mathf.Abs(motorTorque) - defaultTorque, 0), w.collider.rpm) + defaultTorque):0;
 		w.collider.brakeTorque = (!flag?(brakeTorque - defaultTorque) * Mathf.Abs(throttle):0) + defaultTorque;
@@ -267,16 +269,6 @@ function ApplySteering(canSteer : boolean, relativeVelocity : Vector3)
 /**************************************************/
 /*               Utility Functions                */
 /**************************************************/
-
-function Convert_Miles_Per_Hour_To_Meters_Per_Second(value : float) : float
-{
-	return value * 0.44704;
-}
-
-function Convert_Meters_Per_Second_To_Miles_Per_Hour(value : float) : float
-{
-	return value * 2.23693629;	
-}
 
 function HaveTheSameSign(first : float, second : float) : boolean
 {

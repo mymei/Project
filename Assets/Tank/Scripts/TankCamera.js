@@ -15,6 +15,8 @@ var cameraDropAngle = -20;
 
 var ignoreLayers:LayerMask = -1;
 
+var targetTexture:Texture;
+
 private var hit:RaycastHit = new RaycastHit();
 private var raycastLayers:LayerMask = -1;
 
@@ -22,6 +24,10 @@ private var offset:Vector3 = Vector3.forward;
 private var formerPosition:Vector3;
 
 private var euler:Vector3 = Vector3.zero;
+
+private var targetDistance = distance;
+
+private var tmpSpeed = 0.0;
 
 function Start()
 {
@@ -32,9 +38,11 @@ function Start()
 	
 function LateUpdate()
 {
-	distance -= Input.GetAxis("Mouse ScrollWheel") * mouseWheelSensitivity;
-	distance = Mathf.Min(cameraMaximumDistance, Mathf.Max(cameraMinimumDistance, distance));
+	targetDistance -= Input.GetAxis("Mouse ScrollWheel") * mouseWheelSensitivity;
+	targetDistance = Mathf.Min(cameraMaximumDistance, Mathf.Max(cameraMinimumDistance, targetDistance));
 	
+	distance = Mathf.SmoothDamp(distance, targetDistance, tmpSpeed, 0.3f);
+
 	var currentPosition = Input.mousePosition;
 	if (!new Rect(0, 0, Screen.width, Screen.height).Contains(currentPosition)) {
 		currentPosition = formerPosition;
@@ -46,8 +54,13 @@ function LateUpdate()
 
 	offset = Quaternion.Euler(euler) * Vector3.forward;
 	
-	var newTargetPosition = target.position + Vector3.up * height;
-	var newPosition = newTargetPosition - (offset * distance);
+	if (cameraMinimumDistance == targetDistance) {
+		var newTargetPosition = target.position;
+		var newPosition = newTargetPosition - offset * 0.1;		
+	} else {
+		newTargetPosition = target.position + Vector3.up * (height + Mathf.Tan(5 * Mathf.Deg2Rad) * distance);
+		newPosition = newTargetPosition - (offset * distance);	
+	}
 
 	var targetDirection = newPosition - newTargetPosition;
 	
@@ -64,4 +77,10 @@ function LateUpdate()
 	
 	transform.position = newPosition;
 	transform.LookAt(newTargetPosition);
+}
+
+function OnGUI() {
+	var tmp:TurretController = target.GetComponent("TurretController");
+	var screenPos = camera.WorldToScreenPoint(tmp.GetTargetPos());
+	GUI.Box(Rect(screenPos.x - 32, (Screen.height - screenPos.y) - 32, 64, 64), targetTexture);
 }

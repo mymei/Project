@@ -8,12 +8,19 @@ var elevation :float = 20;
 
 private var targetAimPos:Vector3;
 
+var ignoreLayers:LayerMask = -1;
+
+private var hit:RaycastHit = new RaycastHit();
+private var raycastLayers:LayerMask = -1;
+private var targetPos;
+
 function AimControl(targetPos:Vector3) {
 	targetAimPos = targetPos;
 }
 
 function Start () {
-
+	var tmp:int = ignoreLayers;
+	raycastLayers = ~tmp;
 }
 
 function Update () {
@@ -31,4 +38,16 @@ function Update () {
 	
 	jointTransform.localRotation.eulerAngles.x = 
 	Mathf.MoveTowardsAngle(jointTransform.localRotation.eulerAngles.x, tmp, Time.deltaTime * elevationSpeed); 
+
+}
+
+function LateUpdate() {
+	targetPos = transform.position + transform.Find("Joint").forward * 500;	
+	if(Physics.Raycast(transform.position, transform.Find("Joint").forward, hit, 500, -1)) {
+		targetPos = hit.point;
+	}
+}
+
+function GetTargetPos() {
+	return targetPos;
 }
