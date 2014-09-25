@@ -214,7 +214,5 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-Library/metadata/
-Library/ShaderCache/
-Library/ScriptAssemblies/
+Library/
 Temp/
