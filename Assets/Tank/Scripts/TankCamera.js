@@ -13,29 +13,17 @@ var cameraMaximumDistance = 10f;
 var cameraElevateAngle = 85;
 var cameraDropAngle = -20;
 
-var ignoreLayers:LayerMask = -1;
-
-var targetTexture:Texture;
-
-private var hit:RaycastHit = new RaycastHit();
-private var raycastLayers:LayerMask = -1;
-
-private var offset:Vector3 = Vector3.forward;
-private var formerPosition:Vector3;
-
-private var euler:Vector3 = Vector3.zero;
-
-private var targetDistance = distance;
-
-private var tmpSpeed = 0.0;
-
 function Start()
 {
-	formerPosition = Input.mousePosition;
-	var tmp:int = ignoreLayers;
-	raycastLayers = ~tmp;
+	if (target != null) {
+		target.SendMessage("SetEye", transform, SendMessageOptions.DontRequireReceiver); 
+	}
 }
-	
+
+private var hit:RaycastHit = new RaycastHit();
+private var euler:Vector3 = Vector3.zero;
+private var tmpSpeed = 0.0;
+private var targetDistance = distance;
 function LateUpdate()
 {
 	targetDistance -= Input.GetAxis("Mouse ScrollWheel") * mouseWheelSensitivity;
@@ -44,15 +32,11 @@ function LateUpdate()
 	distance = Mathf.SmoothDamp(distance, targetDistance, tmpSpeed, 0.3f);
 
 	var currentPosition = Input.mousePosition;
-	if (!new Rect(0, 0, Screen.width, Screen.height).Contains(currentPosition)) {
-		currentPosition = formerPosition;
-	}
 
-	euler.x -= (currentPosition.y - formerPosition.y) / mouseMoveSensitivity * Mathf.Rad2Deg;
+	euler.x -= Input.GetAxis("Mouse Y") / mouseMoveSensitivity * Mathf.Rad2Deg;
 	euler.x = Mathf.Max(cameraDropAngle, Mathf.Min(cameraElevateAngle, euler.x));
-	euler.y += (currentPosition.x - formerPosition.x) / mouseMoveSensitivity * Mathf.Rad2Deg;
-
-	offset = Quaternion.Euler(euler) * Vector3.forward;
+	euler.y += Input.GetAxis("Mouse X") / mouseMoveSensitivity * Mathf.Rad2Deg;
+	var offset = Quaternion.Euler(euler) * Vector3.forward;
 	
 	if (cameraMinimumDistance == targetDistance) {
 		var newTargetPosition = target.position;
@@ -64,23 +48,22 @@ function LateUpdate()
 
 	var targetDirection = newPosition - newTargetPosition;
 	
-	var goal = newTargetPosition + (offset * 500);
-	if (Physics.Raycast(newTargetPosition, offset, hit, 500, raycastLayers)) {
-		goal = hit.point;			
-	}		
-	target.BroadcastMessage("AimControl", goal, SendMessageOptions.DontRequireReceiver);
-	
-	formerPosition = currentPosition;
-	
-	if(Physics.Raycast(newTargetPosition, targetDirection, hit, distance, raycastLayers))
+	if(Physics.Raycast(newTargetPosition, targetDirection, hit, distance, ~target.gameObject.layer))
 		newPosition = hit.point;
 	
 	transform.position = newPosition;
 	transform.LookAt(newTargetPosition);
 }
 
-function OnGUI() {
-	var tmp:TurretController = target.GetComponent("TurretController");
-	var screenPos = camera.WorldToScreenPoint(tmp.GetTargetPos());
-	GUI.Box(Rect(screenPos.x - 32, (Screen.height - screenPos.y) - 32, 64, 64), targetTexture);
+function ZoomCamera() {
+
+
+}
+
+function Update() {
+	Screen.lockCursor = true;
+}
+
+function SetTarget(newTarget:Transform) {
+	target = newTarget;
 }

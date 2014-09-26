@@ -215,4 +215,7 @@ pip-log.txt
 .mr.developer.cfg
 
 Library/
+WebPlayer/
+WotEOS_Data/
+WotEOS.exe
 Temp/

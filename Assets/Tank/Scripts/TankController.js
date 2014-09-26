@@ -249,11 +249,12 @@ function getMotorTorque(torque:float, rpm:float) {
 
 function ApplyThrottle(canDrive : boolean, relativeVelocity : Vector3)
 {
-	for(var w : CaterpillarWheel in wheels)
+	for(var index = 0; index < wheels.length; index++)
 	{
+		var w = wheels[index];
 //		var multiplier = Mathf.Clamp(throttle + (ArrayUtility.IndexOf(wheels, w) % 2 == 0?1:-1) * steer, -1, 1);
 		var flag = HaveTheSameSign(relativeVelocity.z, throttle) || Mathf.Abs(relativeVelocity.z) < 1;
-		var multiplier = throttle + (ArrayUtility.IndexOf(wheels, w) % 2 == 0?1:-1) * steer * (throttle >= 0?1:-1); 
+		var multiplier = throttle + (index % 2 == 0?1:-1) * steer * (throttle >= 0?1:-1); 
 		
 		w.collider.motorTorque = flag?multiplier * Mathf.Sign(motorTorque) * (getMotorTorque(Mathf.Max(Mathf.Abs(motorTorque) - defaultTorque, 0), w.collider.rpm) + defaultTorque):0;
 		w.collider.brakeTorque = (!flag?(brakeTorque - defaultTorque) * Mathf.Abs(throttle):0) + defaultTorque;

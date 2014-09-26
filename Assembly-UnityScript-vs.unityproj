@@ -56,7 +56,10 @@
      <Compile Include="Assets\Scripts\JavaScripts\Skidmarks.js" />
      <Compile Include="Assets\Scripts\JavaScripts\SoundController.js" />
      <Compile Include="Assets\Scripts\JavaScripts\SoundToggler.js" />
+     <Compile Include="Assets\Tank\Scripts\AITankDriver.js" />
+     <Compile Include="Assets\Tank\Scripts\GunnerChanger.js" />
      <Compile Include="Assets\Tank\Scripts\PlayerTankDriver.js" />
+     <Compile Include="Assets\Tank\Scripts\PlayerTurretGunner.js" />
      <Compile Include="Assets\Tank\Scripts\TankCamera.js" />
      <Compile Include="Assets\Tank\Scripts\TankController.js" />
      <Compile Include="Assets\Tank\Scripts\TurretController.js" />
